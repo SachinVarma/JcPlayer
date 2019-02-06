@@ -77,8 +77,8 @@ class JcNotificationPlayer private constructor(
         .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setContent(createNotificationPlayerView())
-        .setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
-            PendingIntent.FLAG_CANCEL_CURRENT))
+        /*.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
+            PendingIntent.FLAG_CANCEL_CURRENT))*/
         .setAutoCancel(false)
         .build()
 
@@ -86,7 +86,7 @@ class JcNotificationPlayer private constructor(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       val channel = NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_CHANNEL,
           NotificationManager.IMPORTANCE_HIGH)
-      channel.setDescription("no sound")
+      channel.description = "no sound"
       channel.setSound(null, null)
       val notificationManager = context.getSystemService(NotificationManager::class.java)
       notificationManager.createNotificationChannel(channel)
