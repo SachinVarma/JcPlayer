@@ -17,6 +17,7 @@ import com.example.jean.jcplayer.JcPlayerManagerListener
 import com.example.jean.jcplayer.R
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.PlayerUtil
+import java.lang.Exception
 import java.lang.ref.WeakReference
 
 /**
@@ -92,7 +93,11 @@ class JcNotificationPlayer private constructor(
       notificationManager.createNotificationChannel(channel)
     }
 
-    notification?.let { notificationManager.notify(NOTIFICATION_ID, it) }
+    try {
+      notification?.let { notificationManager.notify(NOTIFICATION_ID, it) }
+    } catch(e: Exception) {
+      e.printStackTrace()
+    }
   }
 
   fun updateNotification() {

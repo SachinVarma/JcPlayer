@@ -40,6 +40,9 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   var currentAudio: JcAudio? = null
     private set
 
+  var isPrepared: Boolean = false
+    private set
+
   private val jcStatus = JcStatus()
 
   private var assetFileDescriptor: AssetFileDescriptor? = null // For Asset and Raw file.
@@ -164,6 +167,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     updateTime()
     serviceListener?.onPreparedListener(status)
+    isPrepared = true
   }
 
   private fun updateStatus(jcAudio: JcAudio? = null, status: JcStatus.PlayState): JcStatus {
@@ -230,16 +234,18 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     object : Thread() {
       override fun run() {
         while (isPlaying) {
-          try {
-            val status = updateStatus(currentAudio, JcStatus.PlayState.PLAYING)
-            serviceListener?.onTimeChangedListener(status)
-            Thread.sleep(TimeUnit.SECONDS.toMillis(1))
-          } catch (e: IllegalStateException) {
-            e.printStackTrace()
-          } catch (e: InterruptedException) {
-            e.printStackTrace()
-          } catch (e: NullPointerException) {
-            e.printStackTrace()
+          if (isPrepared) {
+            try {
+              val status = updateStatus(currentAudio, JcStatus.PlayState.PLAYING)
+              serviceListener?.onTimeChangedListener(status)
+              Thread.sleep(TimeUnit.SECONDS.toMillis(1))
+            } catch (e: IllegalStateException) {
+              e.printStackTrace()
+            } catch (e: InterruptedException) {
+              e.printStackTrace()
+            } catch (e: NullPointerException) {
+              e.printStackTrace()
+            }
           }
         }
       }
