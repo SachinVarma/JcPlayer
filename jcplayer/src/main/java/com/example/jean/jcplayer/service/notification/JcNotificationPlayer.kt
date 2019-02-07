@@ -1,6 +1,7 @@
 package com.example.jean.jcplayer.service.notification
 
 import android.app.Notification
+import android.app.Notification.VISIBILITY_PUBLIC
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -33,8 +34,10 @@ class JcNotificationPlayer private constructor(
   private var title: String? = null
   private var time = "00:00"
   private var iconResource: Int = 0
-  private val notificationManager: NotificationManagerCompat by lazy {
-    NotificationManagerCompat.from(context)
+
+  private val notificationManager: NotificationManager by lazy {
+//    NotificationManagerCompat.from(context)
+    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }
   private var notification: Notification? = null
 
@@ -46,6 +49,7 @@ class JcNotificationPlayer private constructor(
     const val ACTION = "jcplayer.ACTION"
     const val PLAYLIST = "jcplayer.PLAYLIST"
     const val CURRENT_AUDIO = "jcplayer.CURRENT_AUDIO"
+    const val CATEGORY_MUSIC = "music"
 
     private const val NOTIFICATION_ID = 100
     private const val NOTIFICATION_CHANNEL = "jcplayer.NOTIFICATION_CHANNEL"
@@ -72,24 +76,58 @@ class JcNotificationPlayer private constructor(
     openUi.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
     //        JcPlayerManager.getInstance(context, null, null).registerNotificationListener(this);
 
+//    notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+//        .setSmallIcon(iconResourceResource)
+//        .setSound(null)
+//        .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
+//        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//        .setContent(createNotificationPlayerView())
+//        /*.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
+//            PendingIntent.FLAG_CANCEL_CURRENT))*/
+//        .setAutoCancel(false)
+//        .build()
+//
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//      val channel = NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_CHANNEL,
+//          NotificationManager.IMPORTANCE_HIGH)
+//      channel.description = ""
+//      channel.setSound(null, null)
+//      val notificationManager = context.getSystemService(NotificationManager::class.java)
+//      notificationManager.createNotificationChannel(channel)
+//    }
+
+    val priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      NotificationCompat.PRIORITY_HIGH
+    } else {
+      NotificationCompat.PRIORITY_DEFAULT
+    }
+
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
+        .setCategory(CATEGORY_MUSIC)
         .setSound(null)
         .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setContent(createNotificationPlayerView())
-        /*.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
-            PendingIntent.FLAG_CANCEL_CURRENT))*/
+        .setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
+            PendingIntent.FLAG_CANCEL_CURRENT))
         .setAutoCancel(false)
+        .setOngoing(true)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setDefaults(Notification.DEFAULT_LIGHTS)
+        .setVibrate( LongArray(1) { 0L })
+        .setPriority(priority)
         .build()
 
     @RequiresApi(Build.VERSION_CODES.O)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       val channel = NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_CHANNEL,
-          NotificationManager.IMPORTANCE_HIGH)
-      channel.description = "no sound"
+          NotificationManager.IMPORTANCE_DEFAULT)
+      channel.enableVibration(false)
+      channel.description = CATEGORY_MUSIC
+      channel.lockscreenVisibility = VISIBILITY_PUBLIC
       channel.setSound(null, null)
-      val notificationManager = context.getSystemService(NotificationManager::class.java)
       notificationManager.createNotificationChannel(channel)
     }
 
