@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
 import android.widget.RemoteViews
 import com.example.jean.jcplayer.JcPlayerManager
 import com.example.jean.jcplayer.JcPlayerManagerListener
@@ -20,6 +19,7 @@ import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.PlayerUtil
 import java.lang.Exception
 import java.lang.ref.WeakReference
+
 
 /**
  * This class is a Android [Service] that handles notification changes on background.
@@ -102,7 +102,9 @@ class JcNotificationPlayer private constructor(
     } else {
       NotificationCompat.PRIORITY_DEFAULT
     }
-
+    val notificationIntent = Intent(context, context::class.java)
+    notificationIntent.action = Intent.ACTION_MAIN
+    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
         .setCategory(CATEGORY_MUSIC)
@@ -110,7 +112,7 @@ class JcNotificationPlayer private constructor(
         .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setContent(createNotificationPlayerView())
-        .setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
+        .setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent,
             PendingIntent.FLAG_CANCEL_CURRENT))
         .setAutoCancel(false)
         .setOngoing(true)
