@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
 //        jcAudios.add(JcAudio.createFromRaw("Raw audio 1", R.raw.a_34));
         jcAudios.add(JcAudio.createFromRaw("Raw audio 2", R.raw.a_203));
         //jcAudios.add(JcAudio.createFromFilePath("File directory audio", this.getFilesDir() + "/" + "CANTO DA GRAÚNA.mp3"));
+        jcAudios.add(JcAudio.createFromFilePath("File directory audio", "/storage/emulated/0/SOS/.data/player_audio/e669da2ddf221a02abb5b251c00b54f11550062335350.mp3"));
         //jcAudios.add(JcAudio.createFromAssets("I am invalid audio", "aaa.mid")); // invalid assets file
 //        player.initPlaylist(jcAudios);
 
