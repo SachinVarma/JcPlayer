@@ -21,6 +21,8 @@ import java.lang.Exception
 import java.lang.ref.WeakReference
 
 
+
+
 /**
  * This class is a Android [Service] that handles notification changes on background.
  *
@@ -105,6 +107,8 @@ class JcNotificationPlayer private constructor(
     val notificationIntent = Intent(context, context::class.java)
     notificationIntent.action = Intent.ACTION_MAIN
     notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    notificationIntent.addFlags(
+        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
         .setCategory(CATEGORY_MUSIC)
