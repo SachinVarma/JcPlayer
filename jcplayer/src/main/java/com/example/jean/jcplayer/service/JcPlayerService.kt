@@ -1,18 +1,20 @@
 package com.example.jean.jcplayer.service
 
+import android.Manifest
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
-import android.os.Handler
+import android.os.Build
 import android.os.IBinder
-import android.os.Looper
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.widget.Toast
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.Origin
 import com.example.jean.jcplayer.general.errors.AudioAssetsInvalidException
@@ -62,7 +64,6 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   }
 
   override fun onBind(intent: Intent): IBinder? = binder
-
 
 
   private lateinit var phoneStateListener: PhoneStateListener
@@ -313,6 +314,14 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
       Origin.FILE_PATH -> {
         val file = File(path)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          if (checkSelfPermission(
+                  Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("JCPlayer", "Permission not available")
+          } else {
+            Log.d("JCPlayer", "Permission available")
+          }
+        }
         //TODO: find an alternative to checking if file is exist, this code is slower on average.
         //read more: http://stackoverflow.com/a/8868140
         return file.exists()
