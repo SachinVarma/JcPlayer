@@ -233,6 +233,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
           it.stop()
           it.reset()
           it.release()
+          isPrepared = false
           mediaPlayer = null
         }
 
@@ -249,11 +250,13 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
       JcStatus.PlayState.PREPARING -> {
         isPlaying = false
         isPaused = true
+        isPrepared = false
       }
 
       JcStatus.PlayState.PLAYING -> {
         isPlaying = true
         isPaused = false
+        isPrepared = true
       }
 
       else -> { // CONTINUE case

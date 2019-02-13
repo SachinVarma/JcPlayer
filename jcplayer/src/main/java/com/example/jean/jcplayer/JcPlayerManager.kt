@@ -188,8 +188,11 @@ class JcPlayerManager
                             .also { notification ->
                                 jcPlayerManagerListener = notification
                             }
-
-                    createNewNotification(iconResource)
+                    try {
+                      createNewNotification(iconResource)
+                    } catch (e: Exception) {
+                      e.printStackTrace()
+                    }
                 }
     }
 
