@@ -103,8 +103,11 @@ class JcNotificationPlayer private constructor(
       NotificationCompat.PRIORITY_DEFAULT
     }
     val notificationIntent = Intent(context, context::class.java)
-    notificationIntent.action = Intent.ACTION_MAIN
-    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+//    notificationIntent.action = Intent.ACTION_MAIN
+//    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
         .setCategory(CATEGORY_MUSIC)
