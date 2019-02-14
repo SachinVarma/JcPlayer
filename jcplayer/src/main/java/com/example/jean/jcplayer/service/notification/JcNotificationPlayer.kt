@@ -103,7 +103,11 @@ class JcNotificationPlayer private constructor(
       NotificationCompat.PRIORITY_DEFAULT
     }
     val notificationIntent = Intent(context, context::class.java)
-    notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+    notificationIntent.action = Intent.ACTION_MAIN
+    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    notificationIntent.addFlags(
+        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+//    notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
 //    notificationIntent.action = Intent.ACTION_MAIN
 //    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
