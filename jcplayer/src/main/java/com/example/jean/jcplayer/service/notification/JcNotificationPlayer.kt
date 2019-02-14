@@ -17,7 +17,6 @@ import com.example.jean.jcplayer.JcPlayerManagerListener
 import com.example.jean.jcplayer.R
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.PlayerUtil
-import java.lang.Exception
 import java.lang.ref.WeakReference
 
 
@@ -36,7 +35,7 @@ class JcNotificationPlayer private constructor(
   private var iconResource: Int = 0
 
   private val notificationManager: NotificationManager by lazy {
-//    NotificationManagerCompat.from(context)
+    //    NotificationManagerCompat.from(context)
     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }
   private var notification: Notification? = null
@@ -106,7 +105,9 @@ class JcNotificationPlayer private constructor(
     notificationIntent.action = Intent.ACTION_MAIN
     notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
     notificationIntent.addFlags(
-        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//    notificationIntent.addFlags(
+//        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
 //    notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
 //    notificationIntent.action = Intent.ACTION_MAIN
@@ -125,7 +126,7 @@ class JcNotificationPlayer private constructor(
         .setOngoing(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setDefaults(Notification.DEFAULT_LIGHTS)
-        .setVibrate( LongArray(1) { 0L })
+        .setVibrate(LongArray(1) { 0L })
         .setPriority(priority)
         .build()
 
@@ -142,7 +143,7 @@ class JcNotificationPlayer private constructor(
 
     try {
       notification?.let { notificationManager.notify(NOTIFICATION_ID, it) }
-    } catch(e: Exception) {
+    } catch (e: Exception) {
       e.printStackTrace()
     }
   }
