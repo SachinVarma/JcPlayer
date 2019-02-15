@@ -366,8 +366,8 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {
-    super.onTaskRemoved(rootIntent)
     finalize()
+    super.onTaskRemoved(rootIntent)
   }
 
   override fun onDestroy() {

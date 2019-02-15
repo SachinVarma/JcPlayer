@@ -73,28 +73,6 @@ class JcNotificationPlayer private constructor(
     this.iconResource = iconResourceResource
     val openUi = Intent(context, context.javaClass)
     openUi.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-    //        JcPlayerManager.getInstance(context, null, null).registerNotificationListener(this);
-
-//    notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-//        .setSmallIcon(iconResourceResource)
-//        .setSound(null)
-//        .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
-//        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//        .setContent(createNotificationPlayerView())
-//        /*.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
-//            PendingIntent.FLAG_CANCEL_CURRENT))*/
-//        .setAutoCancel(false)
-//        .build()
-//
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//      val channel = NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_CHANNEL,
-//          NotificationManager.IMPORTANCE_HIGH)
-//      channel.description = ""
-//      channel.setSound(null, null)
-//      val notificationManager = context.getSystemService(NotificationManager::class.java)
-//      notificationManager.createNotificationChannel(channel)
-//    }
 
     val priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationCompat.PRIORITY_HIGH
@@ -106,12 +84,6 @@ class JcNotificationPlayer private constructor(
     notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
     notificationIntent.addFlags(
         Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//    notificationIntent.addFlags(
-//        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-//    notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-
-//    notificationIntent.action = Intent.ACTION_MAIN
-//    notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
 
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
