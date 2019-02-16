@@ -197,4 +197,8 @@ class JcNotificationPlayer private constructor(
   override fun onJcpError(throwable: Throwable) {
 
   }
+
+  override fun onRepeat() {
+
+  }
 }

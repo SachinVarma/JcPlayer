@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import android.net.Uri
@@ -363,6 +364,10 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   fun finalize() {
     onDestroy()
     stopSelf()
+  }
+
+  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    return START_STICKY
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {

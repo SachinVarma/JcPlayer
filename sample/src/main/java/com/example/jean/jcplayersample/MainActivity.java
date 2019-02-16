@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity
         player.initPlaylist(jcAudios, this);
         adapterSetup();
         player.playAudio(jcAudios.get(0));
+        player.getJcPlayerManager().setRepeatCount(1);
+        //player.getJcPlayerManager().activeRepeat();
     }
 
     @Override
@@ -197,5 +199,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStopped(JcStatus status) {
 
+    }
+
+    @Override
+    public void onRepeat() {
+        Toast.makeText(this, "Repeating song", Toast.LENGTH_SHORT).show();
     }
 }
