@@ -365,12 +365,18 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     stopSelf()
   }
 
+  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    return START_STICKY
+  }
+
   override fun onTaskRemoved(rootIntent: Intent?) {
-    super.onTaskRemoved(rootIntent)
+    Log.d("Called","CalledOnTaskRemoved")
     finalize()
+    super.onTaskRemoved(rootIntent)
   }
 
   override fun onDestroy() {
+    Log.d("Called","CalledOnDestroy")
     // Removing listener for call ringtone pause
     try {
       val mgr = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager

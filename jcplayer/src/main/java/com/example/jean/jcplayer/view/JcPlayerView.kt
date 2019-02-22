@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.view_jcplayer.view.*
  */
 class JcPlayerView : LinearLayout, View.OnClickListener, SeekBar.OnSeekBarChangeListener, JcPlayerManagerListener {
 
-   val jcPlayerManager: JcPlayerManager by lazy {
+  val jcPlayerManager: JcPlayerManager by lazy {
     JcPlayerManager.getInstance(context).get()!!
   }
 
@@ -510,6 +510,10 @@ class JcPlayerView : LinearLayout, View.OnClickListener, SeekBar.OnSeekBarChange
   }
 
   override fun onStopped(status: JcStatus) {
+  }
+
+  override fun onRepeat() {
+
   }
 
   override fun onJcpError(throwable: Throwable) {

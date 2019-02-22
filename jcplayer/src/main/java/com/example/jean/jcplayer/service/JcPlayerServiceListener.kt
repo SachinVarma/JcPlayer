@@ -43,4 +43,9 @@ interface JcPlayerServiceListener {
      * Notifies an error for the service listeners
      */
     fun onError(exception: Exception)
+
+    /**
+     * Function called when a song is repeated
+     */
+    fun onRepeat()
 }

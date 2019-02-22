@@ -53,4 +53,9 @@ interface JcPlayerManagerListener {
      * @param throwable The error.
      */
     fun onJcpError(throwable: Throwable)
+
+    /**
+     * Called when we are repeating a song
+     */
+    fun onRepeat()
 }

@@ -1,5 +1,7 @@
 package com.example.jean.jcplayersample;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import com.example.jean.jcplayer.JcPlayerManagerListener;
 import com.example.jean.jcplayer.general.JcStatus;
 import com.example.jean.jcplayer.general.errors.OnInvalidPathListener;
 import com.example.jean.jcplayer.model.JcAudio;
+import com.example.jean.jcplayer.service.JcPlayerService;
 import com.example.jean.jcplayer.view.JcPlayerView;
 
 import java.util.ArrayList;
@@ -30,6 +33,12 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(this, JcPlayerService.class));
+        }else{
+            startService(new Intent(this, JcPlayerService.class));
+        }
 
         recyclerView = findViewById(R.id.recyclerView);
         player = findViewById(R.id.jcplayer);
@@ -76,6 +85,8 @@ public class MainActivity extends AppCompatActivity
         player.initPlaylist(jcAudios, this);
         adapterSetup();
         player.playAudio(jcAudios.get(0));
+        player.getJcPlayerManager().setRepeatCount(1);
+        //player.getJcPlayerManager().activeRepeat();
     }
 
     @Override
@@ -193,5 +204,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStopped(JcStatus status) {
 
+    }
+
+    @Override
+    public void onRepeat() {
+        Toast.makeText(this, "Repeating song", Toast.LENGTH_SHORT).show();
     }
 }

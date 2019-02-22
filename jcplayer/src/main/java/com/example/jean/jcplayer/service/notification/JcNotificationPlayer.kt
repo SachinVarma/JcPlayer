@@ -17,10 +17,7 @@ import com.example.jean.jcplayer.JcPlayerManagerListener
 import com.example.jean.jcplayer.R
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.PlayerUtil
-import java.lang.Exception
 import java.lang.ref.WeakReference
-
-
 
 
 /**
@@ -38,7 +35,7 @@ class JcNotificationPlayer private constructor(
   private var iconResource: Int = 0
 
   private val notificationManager: NotificationManager by lazy {
-//    NotificationManagerCompat.from(context)
+    //    NotificationManagerCompat.from(context)
     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
   }
   private var notification: Notification? = null
@@ -76,28 +73,6 @@ class JcNotificationPlayer private constructor(
     this.iconResource = iconResourceResource
     val openUi = Intent(context, context.javaClass)
     openUi.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-    //        JcPlayerManager.getInstance(context, null, null).registerNotificationListener(this);
-
-//    notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-//        .setSmallIcon(iconResourceResource)
-//        .setSound(null)
-//        .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconResourceResource))
-//        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//        .setContent(createNotificationPlayerView())
-//        /*.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, openUi,
-//            PendingIntent.FLAG_CANCEL_CURRENT))*/
-//        .setAutoCancel(false)
-//        .build()
-//
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//      val channel = NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_CHANNEL,
-//          NotificationManager.IMPORTANCE_HIGH)
-//      channel.description = ""
-//      channel.setSound(null, null)
-//      val notificationManager = context.getSystemService(NotificationManager::class.java)
-//      notificationManager.createNotificationChannel(channel)
-//    }
 
     val priority = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationCompat.PRIORITY_HIGH
@@ -108,7 +83,8 @@ class JcNotificationPlayer private constructor(
     notificationIntent.action = Intent.ACTION_MAIN
     notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
     notificationIntent.addFlags(
-        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
     notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
         .setSmallIcon(iconResourceResource)
         .setCategory(CATEGORY_MUSIC)
@@ -122,7 +98,7 @@ class JcNotificationPlayer private constructor(
         .setOngoing(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setDefaults(Notification.DEFAULT_LIGHTS)
-        .setVibrate( LongArray(1) { 0L })
+        .setVibrate(LongArray(1) { 0L })
         .setPriority(priority)
         .build()
 
@@ -139,7 +115,7 @@ class JcNotificationPlayer private constructor(
 
     try {
       notification?.let { notificationManager.notify(NOTIFICATION_ID, it) }
-    } catch(e: Exception) {
+    } catch (e: Exception) {
       e.printStackTrace()
     }
   }
@@ -219,6 +195,10 @@ class JcNotificationPlayer private constructor(
   }
 
   override fun onJcpError(throwable: Throwable) {
+
+  }
+
+  override fun onRepeat() {
 
   }
 }

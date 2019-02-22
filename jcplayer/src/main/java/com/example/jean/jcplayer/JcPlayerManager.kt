@@ -21,7 +21,7 @@ import java.util.*
 class JcPlayerManager
  constructor(private val serviceConnection: JcServiceConnection) : JcPlayerServiceListener {
 
-    lateinit var context: Context
+  lateinit var context: Context
     private var jcNotificationPlayer: JcNotificationPlayer? = null
     private var jcPlayerService: JcPlayerService? = null
     private var serviceBound = false
@@ -122,7 +122,10 @@ class JcPlayerManager
                 if (repeatCurrAudio) {
                     currentAudio?.let {
                         service.seekTo(0)
-                        service.onPrepared(service.getMediaPlayer()!!)
+                        if (repeatCurrAudio) {
+                          service.serviceListener?.onRepeat()
+                        }
+                      service.onPrepared(service.getMediaPlayer()!!)
                     }
                 } else {
                     service.stop()
@@ -296,6 +299,11 @@ class JcPlayerManager
         notifyError(exception)
     }
 
+    override fun onRepeat() {
+      for (listener in managerListeners) {
+        listener.onRepeat()
+      }
+    }
     /**
      * Notifies errors for the service listeners
      */
