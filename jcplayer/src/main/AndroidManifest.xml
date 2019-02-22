@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         tools:replace="android:label">
         <service
+            android:stopWithTask="false"
+            android:exported="false"
+            android:enabled="true"
             android:name=".service.JcPlayerService" />
 
         <receiver
