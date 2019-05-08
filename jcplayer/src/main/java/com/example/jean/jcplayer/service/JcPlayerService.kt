@@ -288,11 +288,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
               val status = updateStatus(currentAudio, JcStatus.PlayState.PLAYING)
               serviceListener?.onTimeChangedListener(status)
               Thread.sleep(TimeUnit.SECONDS.toMillis(1))
-            } catch (e: IllegalStateException) {
-              e.printStackTrace()
-            } catch (e: InterruptedException) {
-              e.printStackTrace()
-            } catch (e: NullPointerException) {
+            } catch (e: Exception) {
               e.printStackTrace()
             }
           }
