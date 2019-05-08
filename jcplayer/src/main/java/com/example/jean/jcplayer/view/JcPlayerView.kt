@@ -507,6 +507,7 @@ class JcPlayerView : LinearLayout, View.OnClickListener, SeekBar.OnSeekBarChange
   }
 
   override fun onPaused(status: JcStatus) {
+    showPlayButton()
   }
 
   override fun onStopped(status: JcStatus) {

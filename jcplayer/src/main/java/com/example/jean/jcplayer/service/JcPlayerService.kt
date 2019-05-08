@@ -51,6 +51,8 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   var isPrepared: Boolean = false
     private set
 
+  var isFirstTime = false
+
   private val jcStatus = JcStatus()
 
   private var assetFileDescriptor: AssetFileDescriptor? = null // For Asset and Raw file.
@@ -190,8 +192,15 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
   override fun onBufferingUpdate(mediaPlayer: MediaPlayer, i: Int) {}
 
+
   override fun onCompletion(mediaPlayer: MediaPlayer) {
-    serviceListener?.onCompletedListener()
+    if((mediaPlayer.currentPosition) < mediaPlayer.duration){
+      mediaPlayer.seekTo(mediaPlayer.currentPosition)
+      JcPlayerServiceBinder().service.let { service -> currentAudio?.let { service.pause(it) }}
+    }else{
+      isFirstTime = false
+      serviceListener?.onCompletedListener()
+    }
   }
 
   override fun onError(mediaPlayer: MediaPlayer, i: Int, i1: Int): Boolean {
