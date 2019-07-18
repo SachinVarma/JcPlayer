@@ -51,8 +51,6 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   var isPrepared: Boolean = false
     private set
 
-  var isFirstTime = false
-
   private val jcStatus = JcStatus()
 
   private var assetFileDescriptor: AssetFileDescriptor? = null // For Asset and Raw file.
@@ -198,7 +196,6 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
       mediaPlayer.seekTo(mediaPlayer.currentPosition)
       JcPlayerServiceBinder().service.let { service -> currentAudio?.let { service.pause(it) }}
     }else{
-      isFirstTime = false
       serviceListener?.onCompletedListener()
     }
   }
