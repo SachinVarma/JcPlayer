@@ -77,7 +77,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
           if (state == TelephonyManager.CALL_STATE_RINGING) {
             if (isPlaying) {
               currentAudio?.let {
-                pause(it)
+//                pause(it)
               }
             }
           } else if (state == TelephonyManager.CALL_STATE_IDLE) {
