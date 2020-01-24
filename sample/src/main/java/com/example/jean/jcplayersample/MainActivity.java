@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPaused(JcStatus status) {
-
     }
 
     @Override

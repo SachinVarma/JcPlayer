@@ -190,8 +190,14 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
   override fun onBufferingUpdate(mediaPlayer: MediaPlayer, i: Int) {}
 
+
   override fun onCompletion(mediaPlayer: MediaPlayer) {
-    serviceListener?.onCompletedListener()
+    if((mediaPlayer.currentPosition) < mediaPlayer.duration){
+      mediaPlayer.seekTo(mediaPlayer.currentPosition)
+      JcPlayerServiceBinder().service.let { service -> currentAudio?.let { service.pause(it) }}
+    }else{
+      serviceListener?.onCompletedListener()
+    }
   }
 
   override fun onError(mediaPlayer: MediaPlayer, i: Int, i1: Int): Boolean {

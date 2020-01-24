@@ -30,6 +30,11 @@ interface JcPlayerServiceListener {
     fun onCompletedListener()
 
     /**
+     * Notifies on completed audio for the service listeners
+     */
+    fun onCompletedInternetListener()
+
+    /**
      * Notifies on paused for the service listeners
      */
     fun onPausedListener(status: JcStatus)
