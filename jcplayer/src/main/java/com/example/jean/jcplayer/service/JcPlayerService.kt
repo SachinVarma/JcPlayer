@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -56,6 +57,11 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   private var assetFileDescriptor: AssetFileDescriptor? = null // For Asset and Raw file.
 
   var serviceListener: JcPlayerServiceListener? = null
+
+  val wakeLock: PowerManager.WakeLock by lazy {
+    (getSystemService(Context.POWER_SERVICE) as PowerManager)
+        .newWakeLock((PowerManager.PARTIAL_WAKE_LOCK), JcPlayerService::class.java.simpleName)
+  }
 
 
   inner class JcPlayerServiceBinder : Binder() {
@@ -223,7 +229,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
           mediaPlayer?.start()
           isPlaying = true
           isPaused = false
-
+          startWakeLock()
         } catch (exception: Exception) {
           serviceListener?.onError(exception)
         }
@@ -240,6 +246,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
         isPlaying = false
         isPaused = true
+        stopWakeLock()
       }
 
       JcStatus.PlayState.PAUSE -> {
@@ -269,6 +276,18 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     return jcStatus
   }
+
+  private fun startWakeLock() {
+    if (!wakeLock.isHeld) {
+      wakeLock.// 1 hour lockout
+          acquire(60 * 60 * 1000)
+    }
+  }
+
+  private fun stopWakeLock() {
+    wakeLock.release()
+  }
+
 
   private fun updateTime() {
     object : Thread() {
