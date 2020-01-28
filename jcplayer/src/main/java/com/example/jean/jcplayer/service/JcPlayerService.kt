@@ -6,16 +6,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.IBinder
 import android.os.PowerManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.widget.Toast
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.Origin
 import com.example.jean.jcplayer.general.errors.AudioAssetsInvalidException
@@ -33,8 +37,12 @@ import java.util.concurrent.TimeUnit
  * @date 02/07/16.
  * Jesus loves you.
  */
-class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,
-    MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnErrorListener {
+class JcPlayerService : Service(),
+    MediaPlayer.OnPreparedListener,
+    MediaPlayer.OnCompletionListener,
+    MediaPlayer.OnBufferingUpdateListener,
+    MediaPlayer.OnErrorListener,
+    AudioManager.OnAudioFocusChangeListener {
 
   private val binder = JcPlayerServiceBinder()
 
@@ -58,19 +66,43 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
   var serviceListener: JcPlayerServiceListener? = null
 
-  val wakeLock: PowerManager.WakeLock by lazy {
+  private lateinit var audioFocusRequest:AudioFocusRequest
+
+  private val wakeLock: PowerManager.WakeLock by lazy {
     (getSystemService(Context.POWER_SERVICE) as PowerManager)
         .newWakeLock((PowerManager.PARTIAL_WAKE_LOCK), JcPlayerService::class.java.simpleName)
   }
 
+  private  val audioManager: AudioManager by lazy {
+    getSystemService(Context.AUDIO_SERVICE) as AudioManager
+  }
 
   inner class JcPlayerServiceBinder : Binder() {
     val service: JcPlayerService
       get() = this@JcPlayerService
   }
 
-  override fun onBind(intent: Intent): IBinder? = binder
+  override fun onAudioFocusChange(focusChange: Int) {
+    currentAudio?.let {
+      if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
+          focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK ||
+          focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
+      ) {
+        if (mediaPlayer?.isPlaying == true) {
+          pause(it)
+          if (::audioFocusRequest.isInitialized) {
+            if (VERSION.SDK_INT >= VERSION_CODES.O) {
+              audioManager.abandonAudioFocusRequest(audioFocusRequest)
+            }
+          } else {
+            audioManager.abandonAudioFocus(this);
+          }
+        }
+      }
+    }
+  }
 
+  override fun onBind(intent: Intent): IBinder? = binder
 
   private lateinit var phoneStateListener: PhoneStateListener
 
@@ -79,11 +111,14 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     // Listening for phone call ringtone
     try {
       phoneStateListener = object : PhoneStateListener() {
-        override fun onCallStateChanged(state: Int, incomingNumber: String) {
+        override fun onCallStateChanged(
+          state: Int,
+          incomingNumber: String
+        ) {
           if (state == TelephonyManager.CALL_STATE_RINGING) {
             if (isPlaying) {
               currentAudio?.let {
-//                pause(it)
+                //                pause(it)
               }
             }
           } else if (state == TelephonyManager.CALL_STATE_IDLE) {
@@ -127,18 +162,18 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
             when {
               jcAudio.origin == Origin.URL -> it.setDataSource(jcAudio.path)
               jcAudio.origin == Origin.RAW -> assetFileDescriptor =
-                  applicationContext.resources.openRawResourceFd(
-                      Integer.parseInt(jcAudio.path)
-                  ).also { descriptor ->
-                    it.setDataSource(
-                        descriptor.fileDescriptor,
-                        descriptor.startOffset,
-                        descriptor.length
-                    )
-                    descriptor.close()
-                    assetFileDescriptor = null
-                  }
-
+                applicationContext.resources.openRawResourceFd(
+                    Integer.parseInt(jcAudio.path)
+                )
+                    .also { descriptor ->
+                      it.setDataSource(
+                          descriptor.fileDescriptor,
+                          descriptor.startOffset,
+                          descriptor.length
+                      )
+                      descriptor.close()
+                      assetFileDescriptor = null
+                    }
 
               jcAudio.origin == Origin.ASSETS -> {
                 assetFileDescriptor = applicationContext.assets.openFd(jcAudio.path)
@@ -189,18 +224,25 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     return status
   }
 
-
   fun seekTo(time: Int) {
     mediaPlayer?.seekTo(time)
   }
 
-  override fun onBufferingUpdate(mediaPlayer: MediaPlayer, i: Int) {}
+  override fun onBufferingUpdate(
+    mediaPlayer: MediaPlayer,
+    i: Int
+  ) {
+  }
 
   override fun onCompletion(mediaPlayer: MediaPlayer) {
     serviceListener?.onCompletedListener()
   }
 
-  override fun onError(mediaPlayer: MediaPlayer, i: Int, i1: Int): Boolean {
+  override fun onError(
+    mediaPlayer: MediaPlayer,
+    i: Int,
+    i1: Int
+  ): Boolean {
     return false
   }
 
@@ -213,7 +255,43 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     isPrepared = true
   }
 
-  private fun updateStatus(jcAudio: JcAudio? = null, status: JcStatus.PlayState): JcStatus {
+  private fun getAudioFocus(): Boolean {
+    val focusRequest:Int
+    if (VERSION.SDK_INT >= VERSION_CODES.O) {
+      val mAudioAttributes =
+        AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+      audioFocusRequest =
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(mAudioAttributes)
+            .setAcceptsDelayedFocusGain(true)
+            .setOnAudioFocusChangeListener(this) // Need to implement listener
+            .build()
+      focusRequest = audioManager.requestAudioFocus(audioFocusRequest)
+    } else {
+      focusRequest = audioManager.requestAudioFocus(
+          this,
+          // Use the music stream.
+          AudioManager.STREAM_MUSIC, // There's no AudioAttributes, just the more general constant.
+          // Request permanent focus.
+          AudioManager.AUDIOFOCUS_GAIN
+      )
+    }
+    when(focusRequest) {
+      AudioManager.AUDIOFOCUS_REQUEST_FAILED -> return false
+      // don’t start playback
+      AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> return true
+      // actually start playback
+    }
+    return false
+  }
+
+  private fun updateStatus(
+    jcAudio: JcAudio? = null,
+    status: JcStatus.PlayState
+  ): JcStatus {
     currentAudio = jcAudio
     jcStatus.jcAudio = jcAudio
     jcStatus.playState = status
@@ -226,10 +304,12 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     when (status) {
       JcStatus.PlayState.PLAY -> {
         try {
-          mediaPlayer?.start()
-          isPlaying = true
-          isPaused = false
-          startWakeLock()
+          if (getAudioFocus()) {
+            mediaPlayer?.start()
+            isPlaying = true
+            isPaused = false
+            startWakeLock()
+          }
         } catch (exception: Exception) {
           serviceListener?.onError(exception)
         }
@@ -268,9 +348,11 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
       }
 
       else -> { // CONTINUE case
-        mediaPlayer?.start()
-        isPlaying = true
-        isPaused = false
+        if (getAudioFocus()) {
+          mediaPlayer?.start()
+          isPlaying = true
+          isPaused = false
+        }
       }
     }
 
@@ -290,7 +372,6 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     }
   }
 
-
   private fun updateTime() {
     object : Thread() {
       override fun run() {
@@ -309,14 +390,17 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     }.start()
   }
 
-  private fun isAudioFileValid(path: String, origin: Origin): Boolean {
+  private fun isAudioFileValid(
+    path: String,
+    origin: Origin
+  ): Boolean {
     when (origin) {
       Origin.URL -> return path.startsWith("http") || path.startsWith("https")
 
       Origin.RAW -> {
         assetFileDescriptor = null
         assetFileDescriptor =
-            applicationContext.resources.openRawResourceFd(Integer.parseInt(path))
+          applicationContext.resources.openRawResourceFd(Integer.parseInt(path))
         return assetFileDescriptor != null
       }
 
@@ -333,7 +417,9 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         val file = File(path)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
           if (checkSelfPermission(
-                  Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                  Manifest.permission.READ_EXTERNAL_STORAGE
+              ) != PackageManager.PERMISSION_GRANTED
+          ) {
             Log.d("JCPlayer", "Permission not available")
           } else {
             Log.d("JCPlayer", "Permission available")
@@ -349,7 +435,10 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     }
   }
 
-  private fun throwError(path: String, origin: Origin) {
+  private fun throwError(
+    path: String,
+    origin: Origin
+  ) {
     when (origin) {
       Origin.URL -> throw AudioUrlInvalidException(path)
 
@@ -382,18 +471,22 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     stopSelf()
   }
 
-  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+  override fun onStartCommand(
+    intent: Intent?,
+    flags: Int,
+    startId: Int
+  ): Int {
     return START_STICKY
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {
-    Log.d("Called","CalledOnTaskRemoved")
+    Log.d("Called", "CalledOnTaskRemoved")
     finalize()
     super.onTaskRemoved(rootIntent)
   }
 
   override fun onDestroy() {
-    Log.d("Called","CalledOnDestroy")
+    Log.d("Called", "CalledOnDestroy")
     // Removing listener for call ringtone pause
     try {
       val mgr = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
