@@ -285,7 +285,9 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
   }
 
   private fun stopWakeLock() {
-    wakeLock.release()
+    if (wakeLock.isHeld) {
+      wakeLock.release()
+    }
   }
 
 
@@ -396,7 +398,7 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     try {
       val mgr = getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
       mgr?.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
-
+      stopWakeLock()
     } catch (e: Exception) {
       e.printStackTrace()
     }
