@@ -283,7 +283,11 @@ class JcPlayerManager
         }
     }
 
-    override fun onPausedListener(status: JcStatus) {
+  override fun onCompletedInternetListener() {
+
+  }
+
+  override fun onPausedListener(status: JcStatus) {
         for (listener in managerListeners) {
             listener.onPaused(status)
         }
