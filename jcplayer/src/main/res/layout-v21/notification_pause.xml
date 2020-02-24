@@ -1,21 +1,30 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="55dp"
-    android:background="#FFFFFF"
+    android:layout_height="100dp"
+    android:background="#332E2E"
     android:orientation="horizontal"
     >
 
   <ImageView
       android:id="@+id/icon_player"
-      android:layout_width="55dp"
+      android:layout_width="match_parent"
       android:layout_gravity="center"
-      android:layout_height="55dp"
+      android:scaleType="centerCrop"
+      android:layout_height="match_parent"
+      />
+  <ImageView
+      android:layout_width="match_parent"
+      android:src="#80000000"
+      android:layout_height="match_parent"
+      android:layout_gravity="center"
       />
 
   <RelativeLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:gravity="center"
+      android:layout_gravity="center"
       android:layout_marginStart="5dp"
       >
 
@@ -28,25 +37,28 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="start"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="50dp"
         android:layout_marginStart="10dp"
-        android:layout_toStartOf="@+id/btn_pause_notification"
         android:ellipsize="marquee"
         android:maxLines="1"
         android:scrollHorizontally="true"
         android:text="@string/text_test"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:textSize="12sp"
         />
 
     <ImageButton
         android:id="@+id/btn_pause_notification"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/ic_pause_new"
+        android:layout_marginEnd="15dp"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
+        android:tint="#FFF"
+        android:layout_marginTop="18dp"
+        android:src="@drawable/ic_pause_new"
 
         />
 
@@ -66,18 +78,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:layout_toStartOf="@+id/btn_pause_notification"
         android:ellipsize="marquee"
+        android:layout_marginEnd="50dp"
         android:focusable="true"
         android:marqueeRepeatLimit="marquee_forever"
         android:maxLines="1"
         android:scrollHorizontally="true"
         android:text="@string/text_test"
         android:textAlignment="textStart"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:textSize="14sp"
         />
 
@@ -92,4 +103,4 @@
         android:visibility="invisible"
         />
   </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

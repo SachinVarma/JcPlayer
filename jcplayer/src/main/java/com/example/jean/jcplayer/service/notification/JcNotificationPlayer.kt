@@ -7,17 +7,25 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.text.TextUtils
 import android.widget.RemoteViews
+import android.widget.Toast
 import com.example.jean.jcplayer.JcPlayerManager
 import com.example.jean.jcplayer.JcPlayerManagerListener
 import com.example.jean.jcplayer.R
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.PlayerUtil
+import java.io.IOException
 import java.lang.ref.WeakReference
+import java.net.URL
+import java.util.concurrent.ThreadPoolExecutor
 
 
 /**
@@ -33,6 +41,7 @@ class JcNotificationPlayer private constructor(
   private var title: String? = null
   private var time = "00:00"
   private var iconResource: Int = 0
+  private var image: Bitmap? = null
 
   private val notificationManager: NotificationManager by lazy {
     //    NotificationManagerCompat.from(context)
@@ -68,9 +77,12 @@ class JcNotificationPlayer private constructor(
     }
   }
 
-  fun createNotificationPlayer(title: String?, iconResourceResource: Int) {
+  fun createNotificationPlayer(title: String?, iconResourceResource: Int, image: Bitmap?=null) {
     this.title = title
     this.iconResource = iconResourceResource
+    if(image!=null){
+      this.image = image
+    }
     val openUi = Intent(context, context.javaClass)
     openUi.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
 
@@ -121,7 +133,7 @@ class JcNotificationPlayer private constructor(
   }
 
   fun updateNotification() {
-    createNotificationPlayer(title, iconResource)
+    createNotificationPlayer(title, iconResource,image)
   }
 
   private fun createNotificationPlayerView(): RemoteViews {
@@ -140,6 +152,7 @@ class JcNotificationPlayer private constructor(
     remoteView.setTextViewText(R.id.txt_current_music_notification, title)
     remoteView.setTextViewText(R.id.txt_duration_notification, time)
     remoteView.setImageViewResource(R.id.icon_player, iconResource)
+    remoteView.setImageViewBitmap(R.id.icon_player,image)
     remoteView.setOnClickPendingIntent(R.id.btn_next_notification,
         buildPendingIntent(NEXT, NEXT_ID))
     remoteView.setOnClickPendingIntent(R.id.btn_prev_notification,
@@ -165,7 +178,7 @@ class JcNotificationPlayer private constructor(
   }
 
   override fun onPaused(status: JcStatus) {
-    createNotificationPlayer(title, iconResource)
+    createNotificationPlayer(title, iconResource,image)
   }
 
   override fun onStopped(status: JcStatus) {
@@ -175,13 +188,13 @@ class JcNotificationPlayer private constructor(
   override fun onContinueAudio(status: JcStatus) {}
 
   override fun onPlaying(status: JcStatus) {
-    createNotificationPlayer(title, iconResource)
+    createNotificationPlayer(title, iconResource,image)
   }
 
   override fun onTimeChanged(status: JcStatus) {
     this.time = PlayerUtil.toTimeSongString(status.currentPosition.toInt())
     this.title = status.jcAudio.title
-    createNotificationPlayer(title, iconResource)
+    createNotificationPlayer(title, iconResource,image)
   }
 
 

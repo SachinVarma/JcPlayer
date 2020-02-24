@@ -1,6 +1,7 @@
 package com.example.jean.jcplayer
 
 import android.content.Context
+import android.graphics.Bitmap
 import com.example.jean.jcplayer.general.JcStatus
 import com.example.jean.jcplayer.general.errors.AudioListNullPointerException
 import com.example.jean.jcplayer.general.errors.JcpServiceDisconnectedError
@@ -198,6 +199,28 @@ class JcPlayerManager
                     }
                 }
     }
+
+  /**
+   * Creates a new notification with icon resource.
+   * @param iconResource The icon resource path.
+   */
+  fun createNewNotification(iconResource: Int,image: Bitmap) {
+    jcNotificationPlayer
+        ?.createNotificationPlayer(currentAudio?.title, iconResource,image = image)
+        ?: let {
+          jcNotificationPlayer = JcNotificationPlayer
+              .getInstance(context)
+              .get()
+              .also { notification ->
+                jcPlayerManagerListener = notification
+              }
+          try {
+            createNewNotification(iconResource)
+          } catch (e: Exception) {
+            e.printStackTrace()
+          }
+        }
+  }
 
     /**
      * Updates the current notification

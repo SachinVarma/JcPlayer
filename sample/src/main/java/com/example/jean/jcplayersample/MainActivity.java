@@ -1,6 +1,8 @@
 package com.example.jean.jcplayersample;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +20,8 @@ import com.example.jean.jcplayer.model.JcAudio;
 import com.example.jean.jcplayer.service.JcPlayerService;
 import com.example.jean.jcplayer.view.JcPlayerView;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -28,11 +32,32 @@ public class MainActivity extends AppCompatActivity
     private JcPlayerView player;
     private RecyclerView recyclerView;
     private AudioAdapter audioAdapter;
+    private Bitmap bitmaps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Picasso.get().load("https://image.shutterstock.com/image-photo/colorful-flower-on-dark-tropical-260nw-721703848.jpg").into(
+          new Target() {
+              @Override
+              public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                  Toast.makeText(MainActivity.this,"Success",Toast.LENGTH_LONG).show();
+                  bitmaps = bitmap;
+              }
+
+              @Override
+              public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                  Toast.makeText(MainActivity.this,"Failed",Toast.LENGTH_LONG).show();
+
+              }
+
+              @Override
+              public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+              }
+          });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(new Intent(this, JcPlayerService.class));
@@ -92,7 +117,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        player.createNotification();
+        player.createNotification(bitmaps);
+        //player.createNotification("https://image.shutterstock.com/image-photo/colorful-flower-on-dark-tropical-260nw-721703848.jpg");
     }
 
     protected void adapterSetup() {
@@ -123,7 +149,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-        player.createNotification();
+
+
+        player.createNotification(bitmaps);
+
     }
 
     @Override
@@ -209,4 +238,7 @@ public class MainActivity extends AppCompatActivity
     public void onRepeat() {
         Toast.makeText(this, "Repeating song", Toast.LENGTH_SHORT).show();
     }
+
+
+
 }

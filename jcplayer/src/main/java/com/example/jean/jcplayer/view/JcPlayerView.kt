@@ -2,6 +2,7 @@ package com.example.jean.jcplayer.view
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.os.Build
 import android.support.v4.content.res.ResourcesCompat
@@ -430,8 +431,8 @@ class JcPlayerView : LinearLayout, View.OnClickListener, SeekBar.OnSeekBarChange
    *
    * @param iconResource icon path.
    */
-  fun createNotification(iconResource: Int) {
-    jcPlayerManager.createNewNotification(iconResource)
+  fun createNotification(image: Bitmap) {
+    jcPlayerManager.createNewNotification(R.drawable.ic_notification_default_black,image)
   }
 
   /**
