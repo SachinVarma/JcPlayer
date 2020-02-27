@@ -193,8 +193,11 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
   override fun onCompletion(mediaPlayer: MediaPlayer) {
     if((mediaPlayer.currentPosition) < mediaPlayer.duration){
+      if(mediaPlayer.duration - mediaPlayer.currentPosition <=2){
+        serviceListener?.onCompletedListener()
+      }else{
       mediaPlayer.seekTo(mediaPlayer.currentPosition)
-      JcPlayerServiceBinder().service.let { service -> currentAudio?.let { service.pause(it) }}
+      JcPlayerServiceBinder().service.let { service -> currentAudio?.let { service.pause(it) }}}
     }else{
       serviceListener?.onCompletedListener()
     }
