@@ -193,7 +193,8 @@ class JcPlayerService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
   override fun onCompletion(mediaPlayer: MediaPlayer) {
     if((mediaPlayer.currentPosition) < mediaPlayer.duration){
-      if(mediaPlayer.duration - mediaPlayer.currentPosition <=2){
+      if((TimeUnit.MILLISECONDS.toSeconds(mediaPlayer.duration.toLong()) - TimeUnit.MILLISECONDS.toSeconds(
+              mediaPlayer.currentPosition.toLong())) <=2){
         serviceListener?.onCompletedListener()
       }else{
       mediaPlayer.seekTo(mediaPlayer.currentPosition)
